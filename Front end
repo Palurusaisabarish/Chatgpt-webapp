@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Web App</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        #login, #dashboard, #chat { display: none; }
+        .hidden { display: none; }
+        button { padding: 10px 20px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ChatGPT Web App</h1>
+
+        <!-- Login Section -->
+        <div id="login">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username"><br>
+            <input type="password" id="password" placeholder="Password"><br>
+            <button onclick="handleLogin()">Login</button>
+            <p id="login-error" class="hidden">Invalid credentials, try again.</p>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard">
+            <h2>Welcome to your Dashboard</h2>
+            <button onclick="showChat()">Create Script</button>
+            <button onclick="handleLogout()">Logout</button>
+        </div>
+
+        <!-- Chat Section -->
+        <div id="chat">
+            <h2>ChatGPT Integration</h2>
+            <textarea id="user-input" rows="4" placeholder="Enter your message..."></textarea><br>
+            <button onclick="sendMessage()">Send</button>
+            <p><strong>Response:</strong> <span id="response"></span></p>
+            <button onclick="goToDashboard()">Back to Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        // Show login form on page load
+        document.getElementById("login").style.display = "block";
+
+        function handleLogin() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            
+            if (username === "user" && password === "password") {
+                document.getElementById("login").style.display = "none";
+                document.getElementById("dashboard").style.display = "block";
+                document.getElementById("login-error").classList.add("hidden");
+            } else {
+                document.getElementById("login-error").classList.remove("hidden");
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById("dashboard").style.display = "none";
+            document.getElementById("chat").style.display = "none";
+            document.getElementById("login").style.display = "block";
+        }
+
+        function showChat() {
+            document.getElementById("dashboard").style.display = "none";
+            document.getElementById("chat").style.display = "block";
+        }
+
+        function goToDashboard() {
+            document.getElementById("chat").style.display = "none";
+            document.getElementById("dashboard").style.display = "block";
+        }
+
+        async function sendMessage() {
+            const userInput = document.getElementById("user-input").value;
+            const responseElement = document.getElementById("response");
+            
+            responseElement.textContent = "Loading...";
+            
+            const response = await fetch("/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message: userInput })
+            });
+            
+            const data = await response.json();
+            responseElement.textContent = data.reply;
+        }
+    </script>
+</body>
+</html>
